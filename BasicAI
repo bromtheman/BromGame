@@ -1,0 +1,140 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+public class BasicAI : MonoBehaviour {
+    private bool dead = false;
+    public GameObject Gun; // What is the full object of the gun?
+    private GameObject target; // What is the AI going after?
+	public GameObject ammo; // What should the AI shoot?
+	public GameObject bullet_spawner; // What object should the ai shoot out of?
+	public float shootingdistance = 1f; // shooting distance needs to be less than distance or ai can only shoot while aproaching.
+    public float distance = 1f; // how far away should the AI stop from the player?
+    private RaycastHit hit; // Used to return information from a raycast
+   private bool CanSeePlayer = false; // Can we see the player? Part of the detection system that was ripped.
+    public float fireRate = 1f; // How fast can the AI shoot?
+    private float nextFire; // Used to calculate if we can fire using Fire Rate and Time.Time
+    NavMeshAgent agent;
+    public float RememberTimer = 1f; // how long does the ai remember seeing the player?
+    private float remembertimerreset; // to reset the time later
+    private int counter;
+    private Transform AItransform;
+    // private bool canshoot = false;
+    // Use this for initialization
+    void Start () {
+
+        AItransform = transform;
+        remembertimerreset = RememberTimer;
+        target = GameObject.FindWithTag("Player");
+        for (int x = 0; x <= 2; x++)
+        {
+            Debug.Log("Check:" + x);
+            if (target == null)
+            {
+                Destroy(gameObject);
+            }
+        }
+        agent = GetComponent<NavMeshAgent>();
+        // bullet_spawner = this.transform.Find ("bulletspawn").gameObject;
+    }
+	
+	// Update is called once per frame
+	void Update () {
+     
+        counter++;
+
+        if (counter >= 10)
+        {
+            PlayerAlive();
+            CheckPlayer();
+        }
+
+
+
+  
+            if(CanSeePlayer == true) {
+                Gun.transform.LookAt(target.transform.position);
+                Fire();
+                if (Vector3.Distance(AItransform.position, target.transform.position) >= distance)
+                {
+
+                    agent.SetDestination(target.transform.position);
+                }
+                else
+                {
+                    RememberTimer -= Time.deltaTime;
+                        if(RememberTimer <= 0)
+                    {
+                        ForgotPlayer();
+                    }
+                    
+                }
+                }
+            }
+
+
+    void CheckPlayer()
+    {
+        Vector3 Currentposition = AItransform.position;
+        Vector3 PlayerPosition = target.transform.position;
+        Vector3 direction = PlayerPosition - Currentposition;
+        Debug.DrawRay(transform.position, direction);
+        Ray AITracking = new Ray(transform.position, direction);
+        counter = 0;
+        if (Physics.Raycast(AITracking, out hit))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                CanSeePlayer = true;
+                return;
+            }
+            else
+            {
+                CanSeePlayer = false;
+                return;
+            }
+
+        }
+    }
+        
+    void Death(bool input)
+    {
+        var disable = this.gameObject.GetComponent<BasicAI>();
+        dead = input;
+        disable.enabled = false;
+    }
+	void ForgotPlayer()
+    {
+        agent.SetDestination(AItransform.position);
+        RememberTimer = remembertimerreset;
+    }
+	void Fire ()
+	{
+		if (Vector3.Distance(AItransform.position, target.transform.position) >= shootingdistance )
+		
+		if(Time.time > nextFire){
+            nextFire = Time.time + fireRate;
+			GameObject Bullet_Handler;
+			Bullet_Handler = Instantiate (ammo, bullet_spawner.transform.position, bullet_spawner.transform.rotation);
+            PlayerAlive();
+                
+
+                //Bullet_Handler.transform.Rotate(new Vector3(0, 90, 0));
+                //	r = bullet_spawner.transform.rotation * ;
+
+
+            }
+
+}
+
+    void PlayerAlive()
+    {
+            if (target == null)
+            {
+                Destroy(this.gameObject);
+
+            }
+        }
+    }
+
+
