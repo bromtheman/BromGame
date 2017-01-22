@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class FirstPersonController : MonoBehaviour {
+    public float movementSpeed = 5.0f;
+    float verticalVelocity = 0;
+    public float jumpHeight = 2;
+    CursorLockMode wantedMode;
+    // Use this for initialization
+    void Start () {
+        Cursor.visible = false;
+        wantedMode = CursorLockMode.Locked;
+
+    }
+	
+	// Update is called once per frame
+	void Update () {
+        CharacterController cc = GetComponent<CharacterController>();
+        verticalVelocity += Physics.gravity.y * Time.deltaTime;
+        float rotX = Input.GetAxis("Mouse X");
+
+        transform.Rotate(0, rotX, 0);
+        float forwardSpeed = Input.GetAxis("Vertical") * movementSpeed;
+        float sideSpeed = Input.GetAxis("Horizontal") * movementSpeed;
+     
+        Vector3 speed = new Vector3(sideSpeed, verticalVelocity, forwardSpeed);
+       speed = transform.rotation * speed;
+
+        if (cc.isGrounded)
+        {
+            if (Input.GetButton("Jump"))
+            {
+                verticalVelocity = jumpHeight;
+            }
+        }
+        cc.Move(speed * Time.deltaTime);
+		
+  
+        }
+
+	}
+
