@@ -1,0 +1,29 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Interactable : MonoBehaviour
+{
+    public bool IsHealth = false; // Is this interactable a health upgrade?
+    public bool IsAmmo = false; // Is this interactable an ammo upgrade?
+    public int HealthGained = 0; // how much health is gained?
+    public int AmmoGained = 0; // how much ammo is gained?
+    public bool DestroyedOnUse = false; // Is this object destroyed on usage?
+    // Use this for initialization
+    public void Activate(GameObject Interactor)
+    {
+        if (IsHealth)
+        {
+           Interactor.gameObject.SendMessageUpwards("AddHealth", HealthGained);
+            if(DestroyedOnUse)
+            {
+                Destroy(gameObject);
+            }
+        }
+        if (IsAmmo)
+        {
+
+        }
+
+    }
+}
