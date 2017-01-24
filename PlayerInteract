@@ -1,0 +1,61 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerInteract : MonoBehaviour
+{
+    public Text Indicator;
+    private int counter = 0;
+    public float interactdistance = 1f;
+
+    // Use this for initialization
+    void Start()
+    {
+        Indicator.enabled = false;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        counter++;
+        if (counter == 5)
+        {
+            Vector3 rayout = new Vector3(0, 0, 1);
+            rayout = transform.rotation * rayout;
+            Debug.DrawRay(transform.position, rayout);
+            Ray InteractLine = new Ray(transform.position, rayout);
+            RaycastHit hit;
+            if (Physics.Raycast(InteractLine, out hit ))
+            {
+                if (hit.collider.CompareTag("Interactable") && hit.distance < interactdistance )
+                {
+                    Indicator.enabled = true;
+                    Debug.Log("we could do something with this");
+                    if (Input.GetButton("Interact"))
+                    {
+                      Interactable interactableobject =  hit.collider.gameObject.GetComponent<Interactable>();
+                        interactableobject.Activate(this.gameObject);
+                    }
+                    counter = 0;
+
+
+                }
+                else
+                {
+                    Indicator.enabled = false;
+                    Debug.Log("Can't do anything");
+                    counter = 0;
+                }
+            }
+
+        }
+
+    
+        }
+
+
+
+
+    }
+
